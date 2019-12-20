@@ -29,13 +29,7 @@ namespace ComonadPlayground
             Values.Head();
 
         public NonEmptyList<B> Extend<B>(Func<NonEmptyList<A>, B> f) =>
-            new NonEmptyList<B>(Extend(Values, f));
-
-        private static Seq<B> Extend<B>(Seq<A> values, Func<NonEmptyList<A>, B> f) =>
-            values.Match(
-                Empty: () => throw new Exception("Impossible"),
-                Head:  x  => Seq1(f(new NonEmptyList<A>(Seq1(x)))),
-                Tail:  (x, xs) => Seq1(f(new NonEmptyList<A>(Seq1(x)))).Concat(Extend(xs, f)));
+            Duplicate().Map(f);
 
         public NonEmptyList<B> Map<B>(Func<A, B> f) =>
             new NonEmptyList<B>(Values.Map(f));
@@ -51,7 +45,16 @@ namespace ComonadPlayground
         private A Index(int ix) =>
             Values.ElementAt(ix);
 
+        public static Func<NonEmptyList<A>, Seq<A>> TakeS(int windowSize) => x =>
+            x.Take(windowSize);
+
+        public Seq<A> Take(int toTake) =>
+            Values.Take(toTake);
+
         public override string ToString() =>
             Values.Fold(string.Empty, (x,y) => x + y.ToString());
+
+        public Unit Iter(Action<A> a) =>
+            Values.Iter(a);
     }
 }

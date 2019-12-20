@@ -17,6 +17,8 @@ namespace ComonadPlayground
                                 Console.WriteLine(x);
                                 var y = x.Duplicate();
                                 Console.WriteLine(y.ToString());
+                                var z = x.Extend(NonEmptyList<int>.TakeS(3));
+                                z.Iter(a => Console.WriteLine("[" + string.Join(',', a)+ "]"));
                             },
                 None: () => Console.WriteLine("FAILED"));
 
