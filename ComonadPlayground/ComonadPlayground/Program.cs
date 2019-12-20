@@ -19,6 +19,8 @@ namespace ComonadPlayground
                                 Console.WriteLine(y.ToString());
                                 var z = x.Extend(NonEmptyList<int>.TakeS(3));
                                 z.Iter(a => Console.WriteLine("[" + string.Join(',', a)+ "]"));
+                                var foo = z.Extend(b => b.Extract().Sum() / 3.0);
+                                foo.Iter(a => Console.WriteLine(a));
                             },
                 None: () => Console.WriteLine("FAILED"));
 
