@@ -9,6 +9,12 @@ namespace ComonadPlayground
         {
             var xs = new Seq<int>(new[] { 0, 1, 2, 3, 4, 5 });
 
+            var gr = FocusedGrid<int>.Create(new Seq<Seq<int>>(new[] { xs, xs, xs }));
+
+            gr.Match(
+                Some: x => Console.WriteLine(x.Map(y => y == 2 || y == 4 ? "#" : ".")), 
+                None: () => Console.WriteLine("Invalid Grid"));
+
             var ne = NonEmptyList<int>.Create(xs);
 
             ne.Match(
