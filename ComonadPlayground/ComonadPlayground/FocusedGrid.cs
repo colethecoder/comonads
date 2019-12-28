@@ -39,9 +39,16 @@ namespace ComonadPlayground
 
         public (int X, int Y) Pos => (X, Y);
 
-        public Option<A> TakeX(int x) =>
+        public Option<A> PeekS(int x, int y) =>
+            Y + y >= 0 && Y + y < Grid.Count &&
             X + x >= 0 && X + x < Grid[0].Count
-            ? Some(Grid.ElementAt(Y).ElementAt(x + X))
+            ? Some(Grid.ElementAt(Y+y).ElementAt(x + X))
+            : None;
+
+        public Option<FocusedGrid<A>> SeekS(int x, int y) =>
+            Y + y >= 0 && Y + y < Grid.Count &&
+            X + x >= 0 && X + x < Grid[0].Count
+            ? Some(new FocusedGrid<A>(Grid, x, y))
             : None;
 
         public override string ToString() =>

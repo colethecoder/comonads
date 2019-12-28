@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using static LanguageExt.Prelude;
 using System;
 
 namespace ComonadPlayground
@@ -9,11 +10,13 @@ namespace ComonadPlayground
         {
             var xs = new Seq<int>(new[] { 0, 1, 2, 3, 4, 5 });
 
-            var gr = FocusedGrid<int>.Create(new Seq<Seq<int>>(new[] { xs, xs, xs }));
+            var gr = from g in FocusedGrid<int>.Create(new Seq<Seq<int>>(new[] { xs, xs, xs }))
+                     from m in g.SeekS(2,1)
+                     select m;
 
             gr.Match(
-                Some: x => Console.WriteLine(x.Map(y => y == 2 || y == 4 ? "#" : ".")), 
-                None: () => Console.WriteLine("Invalid Grid"));
+                Some: x => Grid(x),
+                None: () => { Console.WriteLine("Invalid Grid"); return unit; });            
 
             var ne = NonEmptyList<int>.Create(xs);
 
@@ -31,5 +34,20 @@ namespace ComonadPlayground
                 None: () => Console.WriteLine("FAILED"));
 
         }
+
+        public static Unit Grid(FocusedGrid<int> grid)
+        {
+            Console.WriteLine(grid.ToString());
+            
+            var neighbours = new Seq<(int, int)>(new[] { (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1) });
+
+            var foo = neighbours.Map(x => grid.PeekS(x.Item1, x.Item2));
+
+            Console.WriteLine(string.Join(' ', foo.Somes()));
+
+
+            return unit;
+        }
+
     }
 }
