@@ -13,6 +13,9 @@ namespace ComonadPlayground
         private FocusedGrid(Seq<Seq<A>> grid, int x, int y) =>
             (Grid, X, Y) = (grid, x, y);
 
+        public static Option<FocusedGrid<A>> Create(A[][] grid) =>
+            Create(grid.ToSeq().Map(x => x.ToSeq()));
+
         public static Option<FocusedGrid<A>> Create(Seq<Seq<A>> grid) =>
             grid.Count > 0 &&
             grid.Distinct(x => x.Count).Count == 1
