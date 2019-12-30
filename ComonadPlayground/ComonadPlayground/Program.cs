@@ -1,6 +1,7 @@
 ﻿using LanguageExt;
 using static LanguageExt.Prelude;
 using System;
+using System.Threading;
 
 namespace ComonadPlayground
 {
@@ -8,28 +9,9 @@ namespace ComonadPlayground
     {
         static void Main(string[] args)
         {
-            var start = new[] {
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            };
-
-            var gr = from g in FocusedGrid<int>.Create(start)
+            var gr = from g in FocusedGrid<int>.Create(PentaDecathlon)
                      from b in Some(g.Map(x => x == 1))
-                     from m in b.SeekS(2,1)
-                     select m;
+                     select b;
 
             gr.Match(
                 Some: x => Grid(x),
@@ -47,21 +29,38 @@ namespace ComonadPlayground
 
         public static Unit Grid(FocusedGrid<bool> grid)
         {
-            PrintGrid(grid);
+            var i = 0;
+            PrintGrid(grid, i);
 
-            var foo = neighbours.Map(x => grid.PeekS(x.Item1, x.Item2));
-
-            Console.WriteLine(string.Join(' ', foo.Somes()));
+            while (i<=120)
+            {
+                i++;
+                grid = grid.Extend(GameOfLifeCell);
+                PrintGrid(grid, i);
+                Thread.Sleep(1000);
+            }
 
             return unit;
         }
 
+        private static bool GameOfLifeCell(FocusedGrid<bool> grid) =>
+            grid.Extract() ? Seq(2, 3).Contains(CountLiveNeighbours(grid))
+                           : CountLiveNeighbours(grid) == 3;
+
+        private static int CountLiveNeighbours(FocusedGrid<bool> grid) =>
+            neighbours.Map(x => grid.PeekS(x.Item1, x.Item2))
+                      .Somes()
+                      .Where(x => x)
+                      .Count();
+
         private static Seq<(int, int)> neighbours =>
             new Seq<(int, int)>(new[] { (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1) });
 
-        private static Unit PrintGrid(FocusedGrid<bool> grid)
+        private static Unit PrintGrid(FocusedGrid<bool> grid, int iteration)
         {
+            Console.Clear();
             Console.WriteLine(grid.Map(x => x ? '#' : '.').ToString());
+            Console.WriteLine($"\nIteration: {iteration}");
             return unit;
         }
 
@@ -77,5 +76,28 @@ namespace ComonadPlayground
             return unit;
         }
 
+        private static int[][] PentaDecathlon =>
+            new[] {
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                new [] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            };
     }
 }
