@@ -2,7 +2,7 @@
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-namespace ComonadPlayground
+namespace Comonad.Types
 {
     public class FocusedGrid<A>
     {
@@ -55,6 +55,6 @@ namespace ComonadPlayground
             : None;
 
         public override string ToString() =>
-            string.Join('\n', Grid.Map(y => string.Join(' ', y.Map(x => x.ToString()))));
+            string.Join("\n", Grid.Map(y => string.Join(" ", y.Map(x => x.ToString()))));
     }
 }

@@ -9,4 +9,8 @@
     <PackageReference Include="LanguageExt.Core" Version="3.3.46" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Comonad.Types\Comonad.Types.csproj" />
+  </ItemGroup>
+
 </Project>

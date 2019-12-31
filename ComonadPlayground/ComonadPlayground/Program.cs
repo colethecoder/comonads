@@ -2,6 +2,7 @@
 using static LanguageExt.Prelude;
 using System;
 using System.Threading;
+using Comonad.Types;
 
 namespace ComonadPlayground
 {

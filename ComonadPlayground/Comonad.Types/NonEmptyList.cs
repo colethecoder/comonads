@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using static LanguageExt.Prelude;
 
-namespace ComonadPlayground
+namespace Comonad.Types
 {
     public class NonEmptyList<A>
     {
