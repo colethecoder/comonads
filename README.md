@@ -43,3 +43,26 @@ Haskell calls the Map function `fmap` and you can see it takes a function from t
 public Option<B> Bind<B>(Func<A, Option<B>> f)
 ```
 
+Bind then allows you to write code like:
+
+```cs
+var result = configItem
+               .Bind(x => GetConfig("BAR"))
+               .Bind(x => GetConfig("TEST"))
+               .Bind(x => GetConfig("ANOTHER"));
+```
+
+At each Bind if the previous value was None then nothing happens otherwise it passes the raw value into the lambda expression and returns the new Option.
+
+Having a Bind function is part of the definition of a Monad, returning to our Haskell definitions we can see a Monad defined as:
+
+```haskell
+class Functor m => Monad m where
+    return :: a -> m a
+    join   :: m (m a) -> m a
+    bind   :: m a -> (a -> m b) -> m b
+```
+
+*Note: this isn't the actual definition of a Monad in Haskell because it uses the `>>=` syntax for bind and doesn't specify join but for our purposes this is a simpler definition. For more info see https://wiki.haskell.org/Monad*
+
+So here we can see that a Monad is a Functor (i.e. has a Map function) with additional functionality. `return` gives you a way to lift a value into the Monad.
