@@ -31,8 +31,11 @@ class Functor f where
 Haskell calls the Map function `fmap` and you can see it takes a function from type `a` to type `b` (`a -> b`) and a functor of type `a` (`f a`) and produces a functor of type `b` (`f b`). We can think of our C# Option example as similar to this:
 
 `f a` is configValue with type `Option<bool>`
+
 `a -> b` is `x => !x` with type `Func<bool, bool>`
+
 `f b` is mappedValue with type `Option<bool>`
+
 
 `Option` also provides a mechanism for composing multiple contextual functions together, `Bind`.
 
