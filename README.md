@@ -1,6 +1,6 @@
 # Functional Programming with Context
 
-Basic types usually allow you to define a value. For example `bool` in C# allows can be `true` or `false`. Often we need to say something more about the type than that. In Language-Ext there are a number of generics that wrap a type to add context. You might have a function that returns a value from some config, it could be a set or not set and if it is set it could be on or off, the function could have the signature:
+Simple types usually allow you to define a value. For example `bool` in C# allows can be `true` or `false`. Often we need to say something more about the type than that. In Language-Ext there are a number of generics that wrap a type to add context. You might have a function that returns a value from some config, it could be a set or not set and if it is set it could be on or off, the function could have the signature:
 
 ```cs
 public Option<bool> GetConfigItem(string key)
@@ -8,7 +8,7 @@ public Option<bool> GetConfigItem(string key)
 
 So in this instance we are trying to get a `bool` but the type we receive back also has the context of whether the config item actually existed or not. It can be `None`, `Some(true)` or `Some(false)`.
 
-In Language-Ext Option has a Map function, this allows you to provide a function that acts on the wrapped value and transforms it in some way.
+Option has a Map function, this allows you to provide a function that acts on the wrapped value and transforms it in some way.
 
 ```cs
 public Option<B> Map<B>(Func<A, B> f)
@@ -65,4 +65,39 @@ class Functor m => Monad m where
 
 *Note: this isn't the actual definition of a Monad in Haskell because it uses the `>>=` syntax for bind and doesn't specify join but for our purposes this is a simpler definition. For more info see https://wiki.haskell.org/Monad*
 
-So here we can see that a Monad is a Functor (i.e. has a Map function) with additional functionality. `return` gives you a way to lift a value into the Monad.
+So here we can see that a Monad is a Functor (i.e. has a Map function) with additional functionality. 
+
+`return` gives you a way to lift a value into the Monad. 
+
+Option has an equivalent:
+
+```cs
+public static Option<A> Some(A value)
+```
+
+`join` gives you a way to unwrap a monad nested within another monad i.e. would convert `Option<Option<bool>>` to `Option<bool>`.
+
+Option has an equivalent:
+
+```cs
+public static Option<A> flatten<A>(Option<Option<A>> ma) 
+```
+
+`bind` can be thought of in terms of `fmap` and `join` (`Map` and `flatten` for Option). You start with a monad `m a` and a function from `a` to `m b` if you use `fmap` the result would be an `m (m b)` which can be converted to `m b` using `join`.
+
+`Bind` is implemented for Option.
+
+You can see from the signature of these functions that they allow you to start with a simple type like a `bool` and then lift it into a contextual type like `Option<bool>`. Bind then lets you take your contextual type and compose it with more simple to contextual functions accumulating a new contextual type as you go.
+
+```cs
+var configValue = GetConfigItem("FOO")
+                    .Bind(foo => foo ? GetConfigItem("FOO2")
+                                     : GetConfigItem("BAR"));
+```
+
+
+
+
+
+
+
